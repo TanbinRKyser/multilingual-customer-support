@@ -2,10 +2,11 @@ from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from app.utils.lang_utils import detect_language
 from app.services.chatbot import get_llm_response
+from app.services.explain import explain_input_text
 
 app = FastAPI()
 
-class ChatRequest(BaseModel):
+class ChatRequest( BaseModel ):
     message: str
     user_id: str
 
@@ -14,10 +15,14 @@ def home():
     return {"message": "Welcome to the mulilingual support chat API!"}
 
 @app.post("/chat")
-def chat(request: ChatRequest):
-    lang = detect_language(request.message)
+def chat( request: ChatRequest ):
+
+    lang = detect_language( request.message )
     response = get_llm_response( request.message, language=lang )
+    explanation = explain_input_text( request.message )
+
     return {
         "response": response,
         "language": lang,
+        "explanation": explanation
     }
