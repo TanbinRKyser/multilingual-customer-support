@@ -18,14 +18,17 @@ This project enables **automatic language detection**, **real‑time translation
 
 ## 📂 Project Structure
 
+```text
+multilingual-customer-support/
 │
-├── backend/ # Core API and business logic
-├── frontend/ # Optional admin/agent dashboard
-├── templates/ # Customer support templates per locale
-├── knowledge_base/ # Localized knowledge base content
-├── integrations/ # Adapters for ticketing/chat systems
-├── tests/ # Unit & integration tests
-└── README.md # You're here
+├── backend/           # Core API and business logic
+├── frontend/          # Optional admin/agent dashboard
+├── templates/         # Customer support templates per locale
+├── knowledge_base/    # Localized knowledge base content
+├── integrations/      # Adapters for ticketing/chat systems
+├── tests/             # Unit & integration tests
+└── README.md          # You're here
+
 
 
 
