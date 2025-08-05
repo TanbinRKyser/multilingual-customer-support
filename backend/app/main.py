@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from app.utils.lang_utils import detect_language
+from app.services.chatbot import get_llm_response
 
 app = FastAPI()
 
@@ -15,7 +16,8 @@ def home():
 @app.post("/chat")
 def chat(request: ChatRequest):
     lang = detect_language(request.message)
+    response = get_llm_response( request.message, language=lang )
     return {
-        "response": f"You said: {request.message}",
+        "response": response,
         "language": lang,
     }
