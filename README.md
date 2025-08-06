@@ -46,7 +46,7 @@ cd backend
 npm install          # or pip install -r requirements.txt
 
 # Frontend Setup
-cd frontend
+cd multilingual-support-fronend
 npm install
 npm run build
 
