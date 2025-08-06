@@ -1,0 +1,22 @@
+<div style="max-width: 600px; margin: 0 auto;">
+
+    <h2>Multilingual Support Bot</h2>
+    
+    <textarea [(ngModel)]="message" rows="4" cols="50" placeholder="Ask your question..."></textarea>
+    <br/>
+
+    <button (click)="sendMessage()">Send</button>
+
+    <h3>Bot Response:</h3>
+    <p>{{ response }}</p>
+
+    <h4>Explanation:</h4>
+    <ul>
+        <li *ngFor="let exp of explanation">
+            <strong>{{ exp.word }}</strong>: {{ exp.weight | number: '1.2-2' }}
+        </li>
+    </ul>
+</div>
+<!-- 
+<p>Chat component loaded!</p>
+<textarea [(ngModel)]="message"></textarea> -->

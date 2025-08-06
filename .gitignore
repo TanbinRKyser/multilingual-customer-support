@@ -1,2 +1,41 @@
 .multi-env/
 __pycache__/
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+out-tsc/
+.tmp/
+
+# Angular cache
+.angular/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment files (optional, if you store API keys)
+src/environments/environment*.ts
+
+# Coverage reports
+coverage/
+
+# IDE/editor settings
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.log
