@@ -39,3 +39,7 @@ Thumbs.db
 *.tmp
 *.temp
 *.log
+
+## pretrained models
+bert_model/
+bert_tokenizer/

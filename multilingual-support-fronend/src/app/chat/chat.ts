@@ -14,6 +14,8 @@ export class Chat {
   message = '';
   response = '';
   explanation: { word: string; weight: number }[] = [];
+  intent = '';
+  confidence = 0;
 
   constructor(private http: HttpClient) {}
 
@@ -22,11 +24,17 @@ export class Chat {
 
   this.http.post<any>('http://127.0.0.1:8000/chat', payload).subscribe({
       next: (resp) => {
-        console.log('Backend response:', resp); // ✅ check in browser console
-        this.response = resp.response; // ✅ correct key name
+        console.log('Backend response:', resp); 
+        
+        this.response = resp.response; 
+
         this.explanation = (resp.explanation || [])
           .map(([word, weight]: [string, number]) => ({ word, weight }));
+
+        this.intent = resp.intent || '';
+        this.confidence = resp.confidence || 0;
       },
+
       error: (err) => {
         console.error('HTTP error:', err);
       }

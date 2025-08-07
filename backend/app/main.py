@@ -4,7 +4,9 @@ from app.utils.lang_utils import detect_language
 from app.services.chatbot import get_llm_response
 from app.services.explain import explain_input_text
 from fastapi.middleware.cors import CORSMiddleware
-    
+from intent_classifier.bert_infer import predict_intent
+
+
 app = FastAPI()
 
 # Allow Angular dev server to call API
@@ -30,9 +32,16 @@ def chat( request: ChatRequest ):
     lang = detect_language( request.message )
     response = get_llm_response( request.message, language=lang )
     explanation = explain_input_text( request.message )
+    intent, confidence = predict_intent(request.message)[0]
+
+    CONF_THRESHOLD = 0.5
+    if confidence < CONF_THRESHOLD:
+        intent = "Unknown"
 
     return {
         "response": response,
         "language": lang,
-        "explanation": explanation
+        "explanation": explanation,
+        "intent": intent,
+        "confidence": round(confidence, 4)
     }
