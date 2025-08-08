@@ -2,20 +2,16 @@
 
     <h2>Multilingual Support Bot</h2>
     
-    <textarea [(ngModel)]="message" rows="4" cols="50" placeholder="Ask your question..."></textarea>
-    <br/>
+    <label>Ask something:</label>
+  <input [(ngModel)]="message" (keyup.enter)="sendMessage()" />
+  <button (click)="sendMessage()">Send</button>
 
-    <button (click)="sendMessage()">Send</button>
-
-    <h3>Bot Response:</h3>
-    <p>{{ response }}</p>
-
-    <h4>Explanation:</h4>
-    <ul>
-        <li *ngFor="let exp of explanation">
-            <strong>{{ exp.word }}</strong>: {{ exp.weight | number: '1.2-2' }}
-        </li>
-    </ul>
+  <div class="response" *ngIf="response">
+    <p><strong>You:</strong> {{ originalMessage }}</p>
+    <p><strong>Bot:</strong> {{ response }}</p>
+    <p><strong>Intent:</strong> {{ intent }} (Confidence: {{ confidence | number:'1.2-2' }})</p>
+    <p><strong>Language:</strong> {{ detectedLanguage }}</p>
+  </div>
 </div>
 <!-- 
 <p>Chat component loaded!</p>
