@@ -1,0 +1,2 @@
+I want to access my account via authentication process. But now I have 2FA enabled, but I lost the recovery key.
+Contact IT admin to recover this codes.

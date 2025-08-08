@@ -17,9 +17,9 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 # Load model and tokenizer
-model = BertForSequenceClassification.from_pretrained(model_path)
-tokenizer = BertTokenizer.from_pretrained(tokenizer_path)
-model.to(device)
+model = BertForSequenceClassification.from_pretrained( model_path )
+tokenizer = BertTokenizer.from_pretrained( tokenizer_path )
+model.to( device )
 model.eval()
 
 # Load label encoder
