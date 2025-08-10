@@ -1,18 +1,36 @@
-<div style="max-width: 600px; margin: 0 auto;">
+<h1>Multilingual Support Bot</h1>
 
-    <h2>Multilingual Support Bot</h2>
-    
-    <label>Ask something:</label>
-  <input [(ngModel)]="message" (keyup.enter)="sendMessage()" />
-  <button (click)="sendMessage()">Send</button>
+<label>Ask something:</label>
+<input [(ngModel)]="message" (keyup.enter)="sendMessage()" />
+<button (click)="sendMessage()" [disabled]="loading">Send</button>
 
-  <div class="response" *ngIf="response">
-    <p><strong>You:</strong> {{ originalMessage }}</p>
-    <p><strong>Bot:</strong> {{ response }}</p>
-    <p><strong>Intent:</strong> {{ intent }} (Confidence: {{ confidence | number:'1.2-2' }})</p>
-    <p><strong>Language:</strong> {{ detectedLanguage }}</p>
+<p *ngIf="loading">Thinking…</p>
+<p *ngIf="error" style="color:#c00">{{ error }}</p>
+
+<div *ngIf="response">
+  <p><strong>You:</strong> {{ originalMessage }}</p>
+  <p><strong>Bot:</strong> {{ response }}</p>
+
+  <p>
+    <strong>Intent:</strong> {{ intent }}
+    <span> (Confidence: {{ confidence | number:'1.2-2' }} / {{ confidencePct() }}%)</span>
+  </p>
+
+  <div style="height:8px;background:#eee;border-radius:4px;overflow:hidden;max-width:320px;">
+    <div [style.width.%]="confidencePct()" [style.height.px]="8"
+         [style.background]="confidence >= 0.7 ? 'green' : (confidence >= 0.4 ? 'orange' : 'red')">
+    </div>
+  </div>
+
+  <p><strong>Language:</strong> {{ detectedLanguage }}</p>
+
+  <div *ngIf="sources?.length">
+    <p><strong>Sources:</strong></p>
+    <ul>
+      <li *ngFor="let s of sources">
+        {{ s.source }} <span *ngIf="s.chunk !== undefined"> (chunk {{ s.chunk }})</span>
+        <div *ngIf="s.snippet">“{{ s.snippet }}…”</div>
+      </li>
+    </ul>
   </div>
 </div>
-<!-- 
-<p>Chat component loaded!</p>
-<textarea [(ngModel)]="message"></textarea> -->

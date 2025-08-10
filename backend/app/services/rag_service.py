@@ -1,34 +1,37 @@
-import os
 from pathlib import Path
-from typing import List, Dict
+from typing import Dict
 from langchain_community.document_loaders import PyPDFLoader, TextLoader, DirectoryLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-import chromadb
-from chromadb.config import Settings
+from langchain.text_splitter import RecursiveCharacterTextSplitter  # or langchain_text_splitters if on LC>=0.2
+from chromadb import PersistentClient
 from app.services.embedding_loader import EmbeddingModel
+import hashlib
 
-CHROMA_DIR = "backend/chroma_db"
+# Paths
+BASE_DIR = Path(__file__).resolve().parents[2]
+DOCS_PATH = BASE_DIR / "data" / "knowledge"
+CHROMA_DIR = BASE_DIR / "chroma_db"
 COLLECTION_NAME = "supporting_docs"
-DOCS_PATH = "backend/data/knowledge"
 
-embedding_model = EmbeddingModel()  # consider a multilingual model in that class
-client = chromadb.Client(Settings(persist_directory=CHROMA_DIR, chroma_db_impl="duckdb+parquet"))
+embedding_model = EmbeddingModel()
+client = PersistentClient(path=str(CHROMA_DIR))
 
 def _get_or_create_collection():
-    try:
-        return client.get_collection(COLLECTION_NAME)
-    except Exception:
-        return client.create_collection(COLLECTION_NAME)
+    return client.get_or_create_collection(
+        name=COLLECTION_NAME,
+        metadata={"hnsw:space": "cosine"}
+    )
+
+def _chunk_id(source: str, idx: int) -> str:
+    return hashlib.sha1(f"{source}::{idx}".encode("utf-8")).hexdigest()
 
 def load_documents_from_directory() -> Dict[str, int]:
-    """Parse PDF/MD/TXT, chunk, embed, and persist to Chroma (no DB reset)."""
+    """Parse PDF/MD/TXT, chunk, embed, and upsert to Chroma (no DB reset)."""
     loaders = [
-        DirectoryLoader(DOCS_PATH, glob="**/*.pdf", loader_cls=PyPDFLoader),
-        DirectoryLoader(DOCS_PATH, glob="**/*.txt", loader_cls=lambda p: TextLoader(p, encoding="utf-8")),
-        DirectoryLoader(DOCS_PATH, glob="**/*.md",  loader_cls=lambda p: TextLoader(p, encoding="utf-8")),
+        DirectoryLoader(str(DOCS_PATH), glob="**/*.pdf", loader_cls=PyPDFLoader),
+        DirectoryLoader(str(DOCS_PATH), glob="**/*.txt", loader_cls=lambda p: TextLoader(p, encoding="utf-8")),
+        DirectoryLoader(str(DOCS_PATH), glob="**/*.md",  loader_cls=lambda p: TextLoader(p, encoding="utf-8")),
     ]
 
-    # Load
     docs = []
     for loader in loaders:
         try:
@@ -37,27 +40,32 @@ def load_documents_from_directory() -> Dict[str, int]:
             print(f"[INGEST] loader issue: {e}")
 
     if not docs:
+        print("[INGEST] No documents found.")
         return {"chunks": 0}
 
-    # Split
     splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
     chunks = splitter.split_documents(docs)
 
-    # Prepare payloads
-    texts = [c.page_content for c in chunks]
-    metadatas = []
-    ids = []
-    for i, c in enumerate(chunks):
-        src = c.metadata.get("source") or c.metadata.get("file_path") or "unknown"
-        metadatas.append({"source": src, "chunk": i})
-        ids.append(f"{src}::chunk_{i}")  # deterministic id per source+chunk
+    if not chunks:
+        print("[INGEST] No chunks produced.")
+        return {"chunks": 0}
 
-    # Embed (batch)
+    texts, metadatas, ids = [], [], []
+    per_source_counts = {}
+
+    for c in chunks:
+        src = c.metadata.get("source") or c.metadata.get("file_path") or "unknown"
+        per_source_counts[src] = per_source_counts.get(src, 0) + 1
+        idx = per_source_counts[src] - 1
+
+        text = " ".join(c.page_content.split()) 
+        texts.append(text)
+        metadatas.append({"source": src, "chunk": idx})
+        ids.append(_chunk_id(src, idx))
+
     embeddings = embedding_model.embed(texts)
 
-    # Upsert to collection
     col = _get_or_create_collection()
-    # Add in batches to avoid large payloads
     B = 128
     for s in range(0, len(texts), B):
         col.upsert(
@@ -67,23 +75,25 @@ def load_documents_from_directory() -> Dict[str, int]:
             metadatas=metadatas[s:s+B],
         )
 
-    client.persist()
     print(f"Indexed {len(texts)} chunks into ChromaDB collection '{COLLECTION_NAME}'.")
     return {"chunks": len(texts)}
 
-
 def query_rag(question: str, top_k: int = 3):
-    """Return top docs + sources; you can feed this to FLAN-T5 later."""
+    """Return top docs + sources for a question."""
     col = _get_or_create_collection()
-    query_embedding = embedding_model.embed([question])[0]
-    results = col.query(
-        query_embeddings=[query_embedding],
+    q_vec = embedding_model.embed([question])[0]
+    res = col.query(
+        query_embeddings=[q_vec],
         n_results=top_k,
         include=["documents", "metadatas", "distances"],
     )
-    docs = results.get("documents", [[]])[0]
-    metas = results.get("metadatas", [[]])[0]
-    # Build a simple joined context and return sources
+
+    docs = (res.get("documents") or [[]])[0]
+    metas = (res.get("metadatas") or [[]])[0]
+
+    if not docs:
+        return {"context": "", "sources": []}
+
     context = "\n\n".join(docs)
     sources = [{"source": m.get("source", ""), "chunk": m.get("chunk", -1)} for m in metas]
     return {"context": context, "sources": sources}

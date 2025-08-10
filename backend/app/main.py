@@ -1,99 +1,71 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from pydantic import BaseModel
-from app.utils.lang_utils import detect_language
-from app.services.chatbot import get_llm_response
-from app.services.explain import explain_input_text
 from fastapi.middleware.cors import CORSMiddleware
 from intent_classifier.bert_infer import predict_intent
+from app.utils.lang_utils import detect_language
+from app.services.rag_service import query_rag  
 
+CONF_THRESHOLD = 0.5
 
-app = FastAPI()
-
-# Allow Angular dev server to call API
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:4200"],  # Angular app URL
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-class ChatRequest( BaseModel ):
+class ChatRequest(BaseModel):
     message: str
-    # user_id: str
 
-class ChatResponse( BaseModel ):
+class ChatResponse(BaseModel):
     original_message: str
     detected_language: str
     intent: str
     confidence: float
     response: str
-    # explanation: list[dict[str, float]] = None
+    sources: list | None = None
+
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:4300", "http://127.0.0.1:4300"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def home():
     return {"message": "Welcome to the multilingual support chat API!"}
 
 @app.post("/chat", response_model=ChatResponse)
-async def chat_endpoint( request: ChatRequest ):
-
+def chat_endpoint(request: ChatRequest):
     message = request.message
 
-
-    ## step 1 : Detect language
-    try: lang = detect_language( message )
-    except Exception as e:
+    # Step 1: Detect language
+    try:
+        lang = detect_language(message)
+    except Exception:
         lang = "unknown"
-    
-    ## step 2 : Predict intent using BERT
-    try: intent, confidence = predict_intent( message )[0]
-    except Exception as e:
-        intent = "Unknown"
-        confidence = 0.0
-        print(f"Intent prediction failed: {e}")
 
-    ## step 3 : Generate Mock Response
+    # Step 2: Predict intent with BERT
+    try:
+        intent, confidence = predict_intent(message)[0]
+    except Exception:
+        intent, confidence = "Unknown", 0.0
+
+    # Step 3: Mock responses for high-confidence matches
     mock_responses = {
-        "reset_password": "To reset your password...",
-        "track_order": "You can track your order...",
-        "cancel_order": "To cancel your order, go to 'My Orders' and select 'Cancel'.",
-        "channel_subscription": "...",
-        "default": "I'm sorry, I didn't understand that...",
+        "reset_password": "To reset your password, click 'Forgot Password' on the login page.",
+        "track_order": "Track your order in the 'My Orders' section. Share your order ID if you need help.",
+        "cancel_order": "To cancel your order, open 'My Orders', select the item, and choose 'Cancel'.",
+        "channel_subscription": "Go to 'My Subscriptions' and follow the cancellation steps.",
+        "default": "I'm not sure—let me check our knowledge base."
     }
 
-
-    CONF_THRESHOLD = 0.35
-
-    if confidence < CONF_THRESHOLD or intent == "Unknown":
-        # Low confidence or no match — fallback to default message
-        response_text = mock_responses["default"]
-    elif intent in mock_responses:
-        # Confident prediction and we have a response for it
+    # Decision: if high confidence & known intent → mock response
+    if confidence >= CONF_THRESHOLD and intent in mock_responses:
         response_text = mock_responses[intent]
+        sources = None
     else:
-        # Intent predicted but not in mock_responses — safe fallback
-        response_text = mock_responses["default"]
-
-    ## step 4 : Generate explanation
-    # explanation = explain_input_text( request.message )
-
-
-    # lang = detect_language( request.message )
-    # response = get_llm_response( request.message, language=lang )
-    # explanation = explain_input_text( request.message )
-    # intent, confidence = predict_intent(request.message)[0]
-
-    # CONF_THRESHOLD = 0.5
-    # if confidence < CONF_THRESHOLD:
-    #     intent = "Unknown"
-
-    # return {
-    #     "response": response,
-    #     "language": lang,
-    #     "explanation": explanation,
-    #     "intent": intent,
-    #     "confidence": round(confidence, 4)
-    # }
+        # Fallback: RAG retrieval + FLAN-T5 generation
+        rag_result = query_rag(message, top_k=3)
+        response_text = rag_result["answer"]
+        sources = rag_result["sources"]
 
     return ChatResponse(
         original_message=message,
@@ -101,5 +73,5 @@ async def chat_endpoint( request: ChatRequest ):
         intent=intent,
         confidence=round(confidence, 4),
         response=response_text,
-        # explanation=explanation
+        sources=sources
     )

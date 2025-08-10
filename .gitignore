@@ -1,5 +1,9 @@
-.multi-env/
+# Python
 __pycache__/
+*.pyc
+*.pyo
+*.pyd
+
 # Dependencies
 node_modules/
 
@@ -43,3 +47,16 @@ Thumbs.db
 ## pretrained models
 bert_model/
 bert_tokenizer/
+
+# Environments
+.env
+.venv/
+.multi-env/
+
+# Chroma DB
+chroma_db/
+*.sqlite3
+
+# OS-specific
+.DS_Store
+Thumbs.db
