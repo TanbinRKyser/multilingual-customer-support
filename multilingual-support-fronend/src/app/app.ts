@@ -9,5 +9,5 @@ import { Chat } from './chat/chat'; // ✅ correct path
   styleUrls: ['./app.css']
 })
 export class App {
-  protected readonly title = signal('frontend');
+  protected readonly title = signal('');
 }

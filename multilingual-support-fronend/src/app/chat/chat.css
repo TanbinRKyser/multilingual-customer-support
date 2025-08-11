@@ -1,51 +1,46 @@
-.confidence-bar-container {
+.chat-container {
+  max-width: 600px;
+  margin: auto;
+}
+
+textarea {
   width: 100%;
-  height: 10px;
-  background-color: #ddd;
-  margin-bottom: 1em;
-  border-radius: 5px;
-  overflow: hidden;
+  height: 80px;
+  margin-bottom: 10px;
+}
+
+button {
+  padding: 6px 12px;
+}
+
+.meta-info {
+  margin-top: 10px;
+  font-size: 14px;
 }
 
 .confidence-bar {
-  height: 100%;
-  transition: width 0.3s ease;
-}
-
-.confidence-bar.low {
-  background-color: red;
-}
-
-.confidence-bar.medium {
-  background-color: orange;
-}
-
-.confidence-bar.high {
-  background-color: green;
-}
-
-
-.explanation-word {
-  display: flex;
-  align-items: center;
-  margin-bottom: 5px;
-}
-
-.word {
-  width: 80px;
-  font-weight: bold;
-}
-
-.bar-container {
-  flex: 1;
+  width: 100%;
+  height: 8px;
   background: #eee;
-  height: 10px;
-  border-radius: 5px;
-  overflow: hidden;
+  margin-top: 4px;
+  border-radius: 4px;
 }
 
-.bar {
+.confidence-fill {
   height: 100%;
-  background: #007bff;
-  transition: width 0.3s ease;
+  background: #4caf50;
+  border-radius: 4px;
+}
+
+.explanation {
+  margin-top: 10px;
+}
+
+.token {
+  display: inline-block;
+  margin: 2px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  color: white;
+  font-size: 13px;
 }
