@@ -1,0 +1,16 @@
+services:
+  api:
+    build: ./backend
+    ports: ["8000:8000"]
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./backend/data:/app/data            # knowledge base + logs
+      - ./backend/chroma_db:/app/chroma_db  # persist vectors
+      - ./backend/intent_classifier:/app/intent_classifier  # your saved model
+    # depends_on: [ollama]   # if you add local LLM later
+
+  frontend:
+    build: ./multilingual-support-frontend
+    ports: ["4300:80"]
+    depends_on: [api]

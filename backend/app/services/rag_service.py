@@ -97,3 +97,9 @@ def query_rag(question: str, top_k: int = 3):
     context = "\n\n".join(docs)
     sources = [{"source": m.get("source", ""), "chunk": m.get("chunk", -1)} for m in metas]
     return {"context": context, "sources": sources}
+
+
+if __name__ == "__main__":
+    from pprint import pprint
+    stats = load_documents_from_directory()
+    pprint(stats)
