@@ -8,11 +8,8 @@ This project enables **automatic language detection**, **real‑time translation
 ## ✨ Features
 
 - **Automatic Language Detection** – Identify the customer's language instantly.
-- **Real‑Time Translation** – Translate messages on the fly using your preferred provider (Google, Amazon, DeepL, etc.).
-- **Bilingual Agent Support** – Escalate conversations to native‑speaking agents when needed.
 - **Multilingual Templates** – Store and serve localized customer support templates.
 - **Knowledge Base Integration** – Provide FAQs and help docs in multiple languages.
-- **Easy Integration** – Works with chatbots, live chat widgets, or ticketing systems like Zendesk and Salesforce.
 
 ---
 
