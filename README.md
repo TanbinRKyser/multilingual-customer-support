@@ -1,11 +1,11 @@
-# Multilingual Customer Support 🌍💬
+# Multilingual Customer Support using XAI
 
 A powerful and flexible solution for handling customer support in multiple languages.  
 This project enables **automatic language detection**, **real‑time translation**, and **seamless agent workflows** to ensure great customer experiences regardless of language barriers.
 
 ---
 
-## ✨ Features
+## Features
 
 - **Automatic Language Detection** – Identify the customer's language instantly.
 - **Multilingual Templates** – Store and serve localized customer support templates.
@@ -31,7 +31,7 @@ multilingual-customer-support/
 
 ---
 
-## 🛠 Installation
+## Installation
 
 ```bash
 # Clone the repository
