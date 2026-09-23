@@ -83,6 +83,4 @@ Customer message
   -> Angular support console
 ```
 
-## Important next steps
 
-Before production use, replace sample policies and contact details, add conversation storage with privacy controls, measure intent quality on a representative multilingual test set, and introduce authenticated agent handoff. Promote the experimental ML path only after it beats the baseline on those evaluations.
