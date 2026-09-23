@@ -1,52 +1,88 @@
-# Multilingual Customer Support 🌍💬
+# Polyglot Support
 
-A powerful and flexible solution for handling customer support in multiple languages.  
-This project enables **automatic language detection**, **real‑time translation**, and **seamless agent workflows** to ensure great customer experiences regardless of language barriers.
+An explainable multilingual customer-support assistant. It detects the customer's language, routes common support intents, grounds answers in local support documentation, and shows the words and sources behind each decision.
 
----
+## What works
 
-## ✨ Features
+- English, German, French, Spanish, and Bengali response templates
+- Password reset, order tracking/cancellation, subscription cancellation, and 2FA recovery intents
+- Confidence-aware fallback and human-handoff messaging
+- Local TXT, Markdown, and PDF knowledge-base search
+- Inspectable intent evidence and cited knowledge files
+- FastAPI API with validation, health check, OpenAPI docs, and CORS
+- Responsive Angular support console
+- Optional BERT, multilingual embeddings, Chroma, LIME/IG, and Airflow experiments
 
-- **Automatic Language Detection** – Identify the customer's language instantly.
-- **Real‑Time Translation** – Translate messages on the fly using your preferred provider (Google, Amazon, DeepL, etc.).
-- **Bilingual Agent Support** – Escalate conversations to native‑speaking agents when needed.
-- **Multilingual Templates** – Store and serve localized customer support templates.
-- **Knowledge Base Integration** – Provide FAQs and help docs in multiple languages.
-- **Easy Integration** – Works with chatbots, live chat widgets, or ticketing systems like Zendesk and Salesforce.
+The default route is deliberately lightweight and deterministic. It starts without downloading an ML model. The original experimental ML files remain available under `backend/intent_classifier`, `backend/app/services`, `backend/notebooks`, and `airflow` for future evaluation—not as unverified production dependencies.
 
----
+## Run locally
 
-## 📂 Project Structure
+### API
 
-```text
-multilingual-customer-support/
-│
-├── backend/           # Core API and business logic
-├── frontend/          # Optional admin/agent dashboard
-├── templates/         # Customer support templates per locale
-├── knowledge_base/    # Localized knowledge base content
-├── integrations/      # Adapters for ticketing/chat systems
-├── tests/             # Unit & integration tests
-└── README.md          # You're here
-
-
-
-
----
-
-## 🛠 Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/TanbinRKyser/multilingual-customer-support.git
-cd multilingual-customer-support
-
-# backend setup
+```powershell
 cd backend
-npm install          # or pip install -r requirements.txt
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements-dev.txt
+uvicorn app.main:app --reload
+```
 
-# Frontend Setup
+Open `http://127.0.0.1:8000/docs` for the interactive API documentation.
+
+### Web app
+
+```powershell
 cd multilingual-support-fronend
 npm install
-npm run build
+npm start -- --port 4300
+```
 
+Open `http://127.0.0.1:4300`.
+
+### Docker
+
+```powershell
+docker compose up --build
+```
+
+The web app is exposed on port 4300 and the API on port 8000.
+
+## API example
+
+```http
+POST /chat
+Content-Type: application/json
+
+{
+  "message": "Wo ist meine Bestellung?",
+  "explain_method": "lime"
+}
+```
+
+The response includes the detected language, normalized intent, confidence, localized answer, resolution route, knowledge sources, and token-level evidence. `explain_method` enables the lightweight explanation output; both accepted values currently use the baseline classifier's exact feature contributions.
+
+## Tests
+
+```powershell
+cd backend
+pytest -q
+
+cd ..\multilingual-support-fronend
+npm run build
+```
+
+## Architecture
+
+```text
+Customer message
+  -> language detection
+  -> transparent intent scoring
+       -> confident: localized support answer + related knowledge sources
+       -> uncertain: lexical knowledge lookup or human-handoff message
+  -> explanation and source metadata
+  -> Angular support console
+```
+
+## Important next steps
+
+Before production use, replace sample policies and contact details, add conversation storage with privacy controls, measure intent quality on a representative multilingual test set, and introduce authenticated agent handoff. Promote the experimental ML path only after it beats the baseline on those evaluations.

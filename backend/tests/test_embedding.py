@@ -1,8 +1,8 @@
 # test_embedding.py
-from app.services.embedding_loader import EmbeddingModel
-import numpy as np
-
 def main():
+    # Experimental model smoke test; intentionally excluded from normal tests.
+    import numpy as np
+    from app.services.embedding_loader import EmbeddingModel
     # Initialize
     emb_model = EmbeddingModel()
 

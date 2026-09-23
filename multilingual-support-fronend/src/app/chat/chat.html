@@ -1,33 +1,46 @@
-<div class="chat-container">
-  <textarea [(ngModel)]="message" placeholder="Type your message..."></textarea>
-  <button (click)="sendMessage()">Send</button>
-
-  <div *ngIf="response">
-    <h3>Bot Response:</h3>
-    <p>{{ response }}</p>
-
-    <div class="meta-info">
-      <p><strong>Detected Language:</strong> {{ detectedLanguage }}</p>
-      <p><strong>Intent:</strong> {{ intent }}</p>
-      <p>
-        <strong>Confidence:</strong>
-        <span>{{ confidence | number: '1.2-2' }}</span>
-      </p>
-      <div class="confidence-bar">
-        <div class="confidence-fill" [style.width.%]="confidence * 100"></div>
-      </div>
-
-      <div *ngIf="explanation.length">
-        <p><strong>Explanation:</strong></p>
-        <p><b>Why this intent?</b></p>
-        <div class="token-container">
-          <span *ngFor="let t of explanation"
-                class="token"
-                [style.backgroundColor]="weightColor(t.weight)">
-            {{ t.token }}
-          </span>
-        </div>
-      </div>
-    </div>
+<section class="support-card" aria-label="Support chat">
+  <div class="card-head">
+    <span class="avatar">✦</span>
+    <div><strong>Support assistant</strong><small>Typically replies instantly</small></div>
   </div>
-</div>
+  <div class="conversation" aria-live="polite">
+    <div class="welcome" *ngIf="!response && !loading">
+      <span>👋</span>
+      <p>Hello! Ask me about passwords, orders, subscriptions, or account access—in your own language.</p>
+    </div>
+    <div class="thinking" *ngIf="loading"><i></i><i></i><i></i><span>Understanding your request…</span></div>
+    <div class="answer" *ngIf="response">
+      <div class="answer-label"><span>✦</span> Answer</div>
+      <p>{{ response }}</p>
+      <div class="badges">
+        <span>{{ languageName }} · {{ detectedLanguage }}</span>
+        <span>{{ intent.replace('_', ' ') }}</span>
+        <span>{{ confidencePct() }}% confidence</span>
+      </div>
+      <details *ngIf="explanation.length || sources.length">
+        <summary>Why this answer?</summary>
+        <p class="detail-copy" *ngIf="explanation.length">These words contributed most to the intent match:</p>
+        <div class="tokens" *ngIf="explanation.length">
+          <span *ngFor="let t of explanation" [style.backgroundColor]="weightColor(t.weight)">{{ t.token }}</span>
+        </div>
+        <div class="sources" *ngIf="sources.length">
+          <p>Knowledge sources</p>
+          <article *ngFor="let source of sources"><b>{{ source.source }}</b><small>{{ source.snippet }}</small></article>
+        </div>
+      </details>
+    </div>
+    <p class="error" *ngIf="error">{{ error }}</p>
+  </div>
+  <div class="composer">
+    <label for="message">Your question</label>
+    <div class="input-wrap">
+      <textarea id="message" [(ngModel)]="message" (keydown)="onKeydown($event)" maxlength="2000" placeholder="Type in any supported language…"></textarea>
+      <button (click)="sendMessage()" [disabled]="loading || !message.trim()" aria-label="Send message">➜</button>
+    </div>
+    <div class="composer-meta"><span>Ctrl + Enter to send</span><span>{{ message.length }}/2000</span></div>
+  </div>
+  <div class="examples" *ngIf="!response">
+    <span>Try an example</span>
+    <button *ngFor="let example of examples" (click)="useExample(example)">{{ example }}</button>
+  </div>
+</section>

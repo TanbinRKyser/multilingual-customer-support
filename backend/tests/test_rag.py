@@ -1,7 +1,8 @@
 # test_rag.py
-from app.services.rag_service import load_documents_from_directory, query_rag
-
 def main():
+    # Experimental semantic pipeline: import only when this script is run so the
+    # normal test suite never downloads an embedding model during collection.
+    from app.services.rag_service import load_documents_from_directory, query_rag
     print("=== Testing RAG Pipeline ===")
 
     # Step 1: Ingest documents

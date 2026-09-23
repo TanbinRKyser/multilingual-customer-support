@@ -1,5 +1,5 @@
-import { Component, signal } from '@angular/core';
-import { Chat } from './chat/chat'; // ✅ correct path
+import { Component } from '@angular/core';
+import { Chat } from './chat/chat';
 
 @Component({
   selector: 'app-root',
@@ -8,6 +8,4 @@ import { Chat } from './chat/chat'; // ✅ correct path
   templateUrl: './app.html',
   styleUrls: ['./app.css']
 })
-export class App {
-  protected readonly title = signal('');
-}
+export class App {}

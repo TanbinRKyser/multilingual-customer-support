@@ -10,9 +10,11 @@ type IGToken = { token: string; weight: number };
 interface ChatResponse {
   original_message: string;
   detected_language: string;
+  language_name: string;
   intent: string;
   confidence: number;   
   response: string;
+  resolution: 'intent' | 'knowledge_base' | 'handoff';
   sources?: Source[] | null;
   explanation?: LimePair[] | IGToken[] | null;
 }
@@ -30,15 +32,22 @@ export class Chat {
   // from backend
   originalMessage = '';
   detectedLanguage = '';
+  languageName = '';
   intent = '';
   confidence = 0;
   response = '';
+  resolution = '';
   sources: Source[] = [];
   explanation: IGToken[] = [];
 
   loading = false;
   error = '';
   explainMethod: 'lime' | 'ig' | null = 'lime';
+  readonly examples = [
+    'I forgot my password',
+    'Wo ist meine Bestellung?',
+    'Je veux annuler ma commande'
+  ];
 
   constructor( private http: HttpClient ) {}
 
@@ -47,6 +56,7 @@ export class Chat {
 
     this.loading = true;
     this.error = '';
+    this.response = '';
 
     const payload: { message: string; explain_method?: 'lime' | 'ig' } = {
       message: this.message,
@@ -57,9 +67,11 @@ export class Chat {
       next: (resp) => {
         this.originalMessage   = resp.original_message ?? '';
         this.detectedLanguage  = resp.detected_language ?? '';
+        this.languageName      = resp.language_name ?? resp.detected_language ?? '';
         this.intent            = resp.intent ?? '';
         this.confidence        = resp.confidence ?? 0;
         this.response          = resp.response ?? '';
+        this.resolution        = resp.resolution ?? '';
         this.sources           = resp.sources ?? [];
 
         const exp = resp.explanation ?? [];
@@ -85,13 +97,22 @@ export class Chat {
     });
   }
 
+  useExample(example: string) {
+    this.message = example;
+    this.sendMessage();
+  }
+
+  onKeydown(event: KeyboardEvent) {
+    if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') this.sendMessage();
+  }
+
   confidencePct(): number {
     return Math.round( ( this.confidence || 0 ) * 100 );
   }
 
   weightColor(w: number): string {
     const a = Math.min( Math.abs( w ), 1);
-    return w >= 0 ? `rgba(0,170,0,${a})` : `rgba(200,0,0,${a})`;
+    return w >= 0 ? `rgba(30,111,88,${.12 + a * .35})` : `rgba(200,70,50,${.12 + a * .35})`;
   }
 
 }

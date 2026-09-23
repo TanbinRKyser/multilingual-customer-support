@@ -1,46 +1,13 @@
-.chat-container {
-  max-width: 600px;
-  margin: auto;
-}
-
-textarea {
-  width: 100%;
-  height: 80px;
-  margin-bottom: 10px;
-}
-
-button {
-  padding: 6px 12px;
-}
-
-.meta-info {
-  margin-top: 10px;
-  font-size: 14px;
-}
-
-.confidence-bar {
-  width: 100%;
-  height: 8px;
-  background: #eee;
-  margin-top: 4px;
-  border-radius: 4px;
-}
-
-.confidence-fill {
-  height: 100%;
-  background: #4caf50;
-  border-radius: 4px;
-}
-
-.explanation {
-  margin-top: 10px;
-}
-
-.token {
-  display: inline-block;
-  margin: 2px;
-  padding: 2px 4px;
-  border-radius: 3px;
-  color: white;
-  font-size: 13px;
-}
+.support-card { overflow: hidden; background: #fff; border: 1px solid #d9e2dc; border-radius: 22px; box-shadow: 0 24px 70px rgba(38, 70, 60, .12); }
+.card-head { display: flex; align-items: center; gap: 12px; padding: 18px 22px; border-bottom: 1px solid #e5ebe7; }
+.avatar { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; background: #e0eee5; color: #1e6f58; }
+.card-head strong, .card-head small { display: block; }.card-head strong { font-size: 14px; }.card-head small { margin-top: 2px; color: #7a8983; font-size: 11px; }
+.conversation { min-height: 260px; max-height: 440px; overflow: auto; padding: 24px; background: linear-gradient(145deg, #fbfcf9, #f4f7f1); }
+.welcome { display: flex; gap: 12px; align-items: flex-start; max-width: 90%; }.welcome span { font-size: 22px; }.welcome p { margin: 0; padding: 14px 16px; border-radius: 4px 16px 16px 16px; background: #fff; box-shadow: 0 3px 14px rgba(31, 57, 49, .07); font-size: 14px; line-height: 1.55; }
+.answer { padding: 18px; border-radius: 16px; background: #fff; border-left: 3px solid #ca7048; box-shadow: 0 5px 20px rgba(31, 57, 49, .07); }.answer-label { color: #1e6f58; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }.answer > p { margin: 11px 0 14px; line-height: 1.6; font-size: 14px; }
+.badges { display: flex; flex-wrap: wrap; gap: 6px; }.badges span { padding: 5px 8px; border-radius: 99px; background: #eef3ee; color: #53645d; font-size: 10px; text-transform: capitalize; }
+details { margin-top: 15px; padding-top: 12px; border-top: 1px solid #e9eeea; } summary { cursor: pointer; color: #36564d; font-size: 12px; font-weight: 700; }.detail-copy, .sources > p { margin: 12px 0 7px; color: #71817a; font-size: 11px; }.tokens { display: flex; flex-wrap: wrap; gap: 5px; }.tokens span { padding: 4px 7px; border-radius: 5px; color: #173d33; font-size: 11px; }.sources article { margin-top: 7px; padding: 9px; background: #f5f7f3; border-radius: 8px; }.sources b, .sources small { display: block; }.sources b { font-size: 11px; }.sources small { margin-top: 3px; color: #6c7a75; line-height: 1.35; }
+.composer { padding: 18px 22px 10px; border-top: 1px solid #e5ebe7; }.composer label { display: block; margin-bottom: 7px; color: #4e625b; font-size: 11px; font-weight: 700; }.input-wrap { display: flex; gap: 10px; align-items: flex-end; }.input-wrap textarea { width: 100%; min-height: 72px; resize: vertical; padding: 12px; border: 1px solid #ced9d2; border-radius: 11px; outline: none; color: #243d37; background: #fcfdfa; }.input-wrap textarea:focus { border-color: #378269; box-shadow: 0 0 0 3px #e2f0e9; }.input-wrap button { flex: 0 0 44px; height: 44px; border: 0; border-radius: 12px; background: #1f6955; color: #fff; cursor: pointer; font-size: 20px; }.input-wrap button:disabled { opacity: .4; cursor: default; }.composer-meta { display: flex; justify-content: space-between; margin-top: 6px; color: #97a19c; font-size: 9px; }
+.examples { padding: 8px 22px 18px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }.examples > span { width: 100%; color: #8a9691; font-size: 10px; }.examples button { padding: 6px 9px; border: 1px solid #dde5df; border-radius: 99px; background: transparent; color: #4f655d; cursor: pointer; font-size: 10px; }.examples button:hover { background: #eef4ef; }
+.thinking { display: flex; align-items: center; gap: 5px; color: #73817c; font-size: 12px; }.thinking i { width: 6px; height: 6px; border-radius: 50%; background: #378269; animation: pulse 1s infinite alternate; }.thinking i:nth-child(2) { animation-delay: .2s; }.thinking i:nth-child(3) { animation-delay: .4s; }.thinking span { margin-left: 6px; }.error { color: #ad3f32; font-size: 13px; }
+@keyframes pulse { to { opacity: .25; transform: translateY(-3px); } }
